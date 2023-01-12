@@ -14,6 +14,8 @@ class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   void signOut(WidgetRef ref) {
+    //no need of navigating as state returns null , so from main.dart we are automatically pushed to login screen
+    //in main.dart , the state is watched by ref.watch() for state changes
     ref.read(authRepositoryProvider).signOut();
     ref.read(userProvider.notifier).update((state) => null);
   }
@@ -37,6 +39,11 @@ class HomeScreen extends ConsumerWidget {
         ),
       );
     }
+  }
+
+  void navigateToDocument(BuildContext context, String documentId) {
+    final navigator = Routemaster.of(context);
+    navigator.push('/document/$documentId');
   }
 
   @override
@@ -68,21 +75,34 @@ class HomeScreen extends ConsumerWidget {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const CustomLoader();
             } else {
-              return ListView.builder(
-                itemCount: snapshot.data!.data.length,
-                itemBuilder: (context, index) {
-                  DocumentModel documentModel = snapshot.data!.data[index];
+              return Center(
+                child: Container(
+                  margin: const EdgeInsets.only(top: 10),
+                  width: 600,
+                  child: ListView.builder(
+                    itemCount: snapshot.data!.data.length,
+                    itemBuilder: (context, index) {
+                      DocumentModel documentModel = snapshot.data!.data[index];
 
-                  return Card(
-                    color: Colors.blue,
-                    child: Center(
-                      child: Text(
-                        documentModel.title,
-                        style: const TextStyle(fontSize: 20),
-                      ),
-                    ),
-                  );
-                },
+                      return InkWell(
+                        onTap: () =>
+                            navigateToDocument(context, documentModel.id),
+                        child: SizedBox(
+                          height: 50,
+                          child: Card(
+                            color: Colors.blue,
+                            child: Center(
+                              child: Text(
+                                documentModel.title,
+                                style: const TextStyle(fontSize: 20),
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
               );
             }
           },
