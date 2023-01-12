@@ -76,16 +76,9 @@ class AuthRepository {
     return error;
   }
 
-  void signOutWithGoogle() async {
-    try {
-      final user = await _googleSignIn.signOut();
-      if (user != null) {
-        log(user.email);
-        log(user.displayName.toString());
-      }
-    } catch (e) {
-      log(e.toString());
-    }
+  void signOut() async {
+    _localStorageRepository.setToken('');
+    await _googleSignIn.signOut();
   }
 
   Future<ErrorModel> getUserData() async {
@@ -94,16 +87,12 @@ class AuthRepository {
       data: null,
     );
     try {
-      log("try block of getUserData executed");
       String? token = await _localStorageRepository.getToken();
-      log("secured token");
       if (token != null) {
         var res = await _client.get(Uri.parse('$host/'), headers: {
           'Content-Type': 'application/json; charset=UTF-8',
           'x-auth-token': token,
         });
-        log("get req successful");
-        log(res.statusCode.toString());
 
         switch (res.statusCode) {
           case 200:

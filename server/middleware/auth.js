@@ -11,7 +11,7 @@ const auth = async(req,res,next) => {
 
 
         const verified = jwt.verify(token, "passwordKey");
-        console.log("upto token verification");
+    
 
         if(!verified)
         return res
@@ -19,7 +19,7 @@ const auth = async(req,res,next) => {
         .json({msg : "Token verification failed , authorization failded"});
 
         
-        console.log("after token verification");
+        
 
         req.user = verified.id
         req.token = token;

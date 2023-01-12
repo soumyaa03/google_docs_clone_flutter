@@ -2,6 +2,8 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const authRouter = require("./routes/auth");
+const documentRouter = require("./routes/document");
+
 
 const PORT = process.env.PORT | 3001;
 
@@ -15,6 +17,8 @@ app.use(authRouter);
 // hex code for @ :- %40
 // hex code for ' :- %27
 // hex code for ' :- %21
+app.use(documentRouter);
+
 const DB = "mongodb+srv://Soumyaa03:Soumya%40123@cluster0.8jslvit.mongodb.net/?retryWrites=true&w=majority";
 // encode special characters in password 
 
