@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_docs/models/document_model.dart';
+import 'package:google_docs/models/error_model.dart';
+import 'package:google_docs/repository/auth_repository.dart';
+import 'package:google_docs/repository/document_repository.dart';
 import 'package:google_docs/view/colors.dart';
 
 class DocumentScreem extends ConsumerStatefulWidget {
@@ -18,11 +22,38 @@ class _DocumentScreemState extends ConsumerState<DocumentScreem> {
   TextEditingController titleController =
       TextEditingController(text: 'Untitled Document');
   final quill.QuillController _quillController = quill.QuillController.basic();
+  ErrorModel? errorModel;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchDocumentData();
+  }
+
+  void fetchDocumentData() async {
+    errorModel = await ref.read(documentRepositoryProvider).getDocumentById(
+          ref.read(userProvider)!.token,
+          widget.id,
+        );
+
+    if (errorModel!.data != null) {
+      titleController.text = (errorModel!.data as DocumentModel).title;
+      setState(() {});
+    }
+  }
 
   @override
   void dispose() {
     super.dispose();
     titleController.dispose();
+  }
+
+  void updateDocumentTitle(WidgetRef ref, String title) {
+    ref.read(documentRepositoryProvider).updateTitle(
+          token: ref.read(userProvider)!.token,
+          id: widget.id,
+          title: title,
+        );
   }
 
   @override
@@ -63,6 +94,10 @@ class _DocumentScreemState extends ConsumerState<DocumentScreem> {
                           borderSide: BorderSide(color: bluecolor)),
                       border: InputBorder.none,
                       contentPadding: EdgeInsets.only(left: 10),
+                    ),
+                    onSubmitted: (value) => updateDocumentTitle(
+                      ref,
+                      value,
                     ),
                   ),
                 )

@@ -15,7 +15,6 @@ documentRouter.post('/doc/create' , auth , async (req,res) => {
 
         });
 // console.log(req.token);
-
         document = await document.save();
         res.json(document);
     } catch (e) {
@@ -33,8 +32,30 @@ documentRouter.get('/docs/me',auth,async (req,res) => {
     } catch (e) {
         res.status(500).json({error : e.message});
     }
+});
 
+documentRouter.post( '/doc/title',auth,async (req,res) => {
+    try {
+        const {id,title} = req.body;
+        const document = await Document.findByIdAndUpdate(id, {title : title});
 
+        res.json(document);
+        
+    } catch (e) {
+      res.status(500).json({error : e.message})
+        
+    }
+});
+
+documentRouter.get('/doc/:id',auth,async (req,res) => {
+
+    try {
+        const document = await Document.findById(req.params.id);
+        res.json(document);
+        
+    } catch (e) {
+        res.status(500).json({error : e.message});
+    }
 });
 
 module.exports = documentRouter;
